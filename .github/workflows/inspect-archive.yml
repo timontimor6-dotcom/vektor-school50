@@ -1,6 +1,9 @@
 name: Inspect site archive
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/inspect-archive.yml'
+      - '.github/workflows/run-inspection.txt'
 permissions:
   contents: read
 jobs:
