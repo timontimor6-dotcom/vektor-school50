@@ -22,7 +22,12 @@ function validToken(event) {
   try { return JSON.parse(Buffer.from(payload, 'base64url').toString()).exp > Date.now(); } catch { return false; }
 }
 
-export default async event => {
+export default async request => {
+  const event = {
+    httpMethod: request.method,
+    headers: Object.fromEntries(request.headers),
+    body: await request.text()
+  };
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed' }, { allow: 'POST' });
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return json(400, { error: 'Некорректный запрос' }); }
