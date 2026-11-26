@@ -1,27 +1,49 @@
-name: Inspect site archive
+name: Install Vektor site files
 on:
   push:
     paths:
+      - '*.zip'
       - '.github/workflows/inspect-archive.yml'
-      - '.github/workflows/run-inspection.txt'
 permissions:
-  contents: read
+  contents: write
 jobs:
-  inspect:
+  install:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: List archive contents
+      - name: Extract ready site
         run: |
           python - <<'PY'
           import zipfile
           from pathlib import Path
-          archives = list(Path('.').glob('*.zip'))
+          archives = sorted(Path('.').glob('*.zip'))
           if not archives:
-              raise SystemExit("ZIP archive not found in repository root")
+              raise SystemExit("ZIP archive not found")
           archive = archives[0]
-          print("ARCHIVE:", archive.name)
           with zipfile.ZipFile(archive) as z:
-              for name in z.namelist():
-                  print(name)
+              z.extractall("extracted")
+          roots = list(Path("extracted").glob("vektor-school50-ready"))
+          if not roots:
+              raise SystemExit("Folder vektor-school50-ready not found")
+          source = roots[0]
+          for item in source.iterdir():
+              target = Path(item.name)
+              if item.is_dir():
+                  import shutil
+                  shutil.copytree(item, target, dirs_exist_ok=True)
+              else:
+                  import shutil
+                  shutil.copy2(item, target)
+          print("Installed files:", ", ".join(p.name for p in source.iterdir()))
           PY
+      - name: Commit extracted site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No extracted changes to commit"
+          else
+            git commit -m "Install Vektor website files [skip ci]"
+            git push
+          fi
