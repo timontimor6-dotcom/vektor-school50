@@ -1,0 +1,24 @@
+name: Inspect site archive
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: List archive contents
+        run: |
+          python - <<'PY'
+          import zipfile
+          from pathlib import Path
+          archives = list(Path('.').glob('*.zip'))
+          if not archives:
+              raise SystemExit("ZIP archive not found in repository root")
+          archive = archives[0]
+          print("ARCHIVE:", archive.name)
+          with zipfile.ZipFile(archive) as z:
+              for name in z.namelist():
+                  print(name)
+          PY
