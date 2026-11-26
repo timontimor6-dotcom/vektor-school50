@@ -2,13 +2,15 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export function json(statusCode, body, extraHeaders = {}) {
-  return {
-    statusCode,
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...extraHeaders },
-    body: JSON.stringify(body)
-  };
-}
-
+  return new Response(JSON.stringify(body), {
+    status: statusCode,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'cache-control': 'no-store',
+      ...extraHeaders
+    }
+  });
+} 
 export function requireSupabase() {
   if (!SUPABASE_URL || !SERVICE_KEY) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
 }
