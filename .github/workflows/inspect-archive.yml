@@ -47,3 +47,5 @@ jobs:
             git commit -m "Install Vektor website files [skip ci]"
             git push
           fi
+
+# Start extraction workflow
