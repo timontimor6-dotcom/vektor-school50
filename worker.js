@@ -53,7 +53,7 @@ async function supabase(env, path, options = {}) {
   const raw = await response.text();
   let data = null;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
-  if (!response.ok) throw new Error("Supabase " + response.status);
+  if (!response.ok) throw new Error("Supabase " + response.status + ": " + String(raw || response.statusText).slice(0, 1000));
   return data;
 }
 function cleanText(value = "") {
