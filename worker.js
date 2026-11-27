@@ -125,7 +125,7 @@ async function adminApi(request, env) {
     return json(400, { error: "Неизвестное действие" });
   } catch (error) {
     console.error("admin api:", error);
-    return json(500, { error: "Ошибка операции с новостями" });
+    return json(500, { error: "Ошибка операции с новостями", detail: error instanceof Error ? error.message : String(error) });
   }
 }
 async function publicNews(env) {
