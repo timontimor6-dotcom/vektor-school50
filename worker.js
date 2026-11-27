@@ -37,7 +37,10 @@ async function validToken(request, secret) {
   } catch { return false; }
 }
 function requireSupabase(env) {
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing Supabase configuration");
+  const missing = [];
+  if (!env.SUPABASE_URL) missing.push("SUPABASE_URL");
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) missing.push("SUPABASE_SERVICE_ROLE_KEY");
+  if (missing.length) throw new Error("Missing Supabase configuration: " + missing.join(", "));
 }
 async function supabase(env, path, options = {}) {
   requireSupabase(env);
